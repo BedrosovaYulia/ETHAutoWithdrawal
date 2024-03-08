@@ -1,0 +1,10 @@
+{
+  "name": "listener",
+  "main": "listener.js",
+  "author": "YuliaBedrosova@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ethers": "^6.11.1"
+  }
+}
