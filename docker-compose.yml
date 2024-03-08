@@ -12,6 +12,7 @@ services:
       - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
     volumes:
       - db:/data/db
+
   app:
     depends_on:
       - mongodb
@@ -32,6 +33,7 @@ services:
   listener:
     depends_on:
       - mongodb
+      - app
     build: ./listener
     restart: unless-stopped
     env_file: ./.env
@@ -44,6 +46,8 @@ services:
       - DB_NAME=$MONGODB_DATABASE
       - DB_PORT=$MONGODB_DOCKER_PORT
       - ALCHEMY_WSS_URL=$ALCHEMY_WSS_URL
+      - API_HOST=app
+      - API_PORT=$NODE_DOCKER_PORT
     stdin_open: true
     tty: true
 
