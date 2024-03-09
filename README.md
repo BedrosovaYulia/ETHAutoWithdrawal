@@ -1,5 +1,5 @@
 # Automatic withdrawal of ether from Ethereum wallet (tutorial)
-This application is written for educational purposes only for video tutorial.
+This application is written for educational purposes only for educational purposes.
 
 ## Subscribe to my channel:
 https://www.youtube.com/@YuliyaBedrosova/videos
