@@ -23,8 +23,7 @@ async function start() {
     wallets = res.data;
     console.log(wallets);
 
-    //TODO: subscribe only on wallets addresses
-    //TODO: restart the process if addresses are updated
+    //TODO: update addresses on a timer?
         
     subscription = await web3.eth.subscribe('pendingTransactions');
 
