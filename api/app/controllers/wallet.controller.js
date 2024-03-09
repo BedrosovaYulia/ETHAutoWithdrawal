@@ -48,3 +48,5 @@ exports.findAll = (req, res) => {
     });
 };
 
+//TODO: delete wallet
+
