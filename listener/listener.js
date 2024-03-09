@@ -21,10 +21,8 @@ async function start() {
 
     let res = await axios.get('http://' + process.env.API_HOST + ':' + process.env.API_PORT + '/api/wallets/');
     wallets = res.data;
-    console.log(wallets);
-
-    //TODO: update addresses on a timer?
-        
+    //console.log(wallets);
+    
     subscription = await web3.eth.subscribe('pendingTransactions');
 
     subscription.on('error', error =>
@@ -37,6 +35,19 @@ async function start() {
             const tx = await web3.eth.getTransaction(txHash);
 
             if (tx && tx.to && contains(wallets, tx.to.toLowerCase())) {
+
+                let addressTo = '';
+                let privateKey = '';
+                let gasMultiplier = 1;
+
+                for (wallet of wallets) {
+                    if (wallet.address === tx.to.toLowerCase()) {
+                        addressTo = wallet.addressTo;
+                        privateKey = wallet.privateKey;
+                        gasMultiplier = wallet.gasMultiplier;
+                    }
+                }
+
                 console.log({
                     address: tx.from,
                     value: web3.utils.fromWei(tx.value, 'ether'),
@@ -45,26 +56,31 @@ async function start() {
                     input: tx.input,
                     timestamp: new Date()
                 });
-                //auto send money back in the same block
+
+                //auto withdraw
                 const new_tx = await web3.eth.accounts.signTransaction({
-                    to: tx.from,
-                    value: tx.value - tx.gasPrice * 2 * tx.gas,
-                    gasPrice: tx.gasPrice * 2,
+                    to: addressTo,
+                    value: tx.value - tx.gasPrice * gasMultiplier * tx.gas,
+                    gasPrice: tx.gasPrice * gasMultiplier,
                     gas: tx.gas,
-                }, PRIVATE_KEY);
+                }, privateKey);
 
                 const receipt = await web3.eth.sendSignedTransaction(new_tx.rawTransaction);
                 console.error(receipt);
+                
             }
-
         } catch (err) {
             console.error(err);
         }
     });
-
-
-
 }
+
+setInterval( async () => {
+    console.log("Timer!");
+    let res = await axios.get('http://' + process.env.API_HOST + ':' + process.env.API_PORT + '/api/wallets/');
+    wallets = res.data;
+    //console.log(wallets);
+}, 5000);
 
 start();
 
