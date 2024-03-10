@@ -91,12 +91,10 @@ async function start() {
 
 }
 
-/*setInterval( async () => {
+setInterval( async () => {
     console.log("Timer!");
-    let res = await axios.get('http://' + process.env.API_HOST + ':' + process.env.API_PORT + '/api/wallets/');
-    wallets = res.data;
-    //console.log(wallets);
-}, 5000);*/
+    start();
+}, 10000);
 
 start();
 
