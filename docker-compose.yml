@@ -41,6 +41,7 @@ services:
       - $LISTENER_LOCAL_PORT:$LISTENER_DOCKER_PORT
     environment:
       - ALCHEMY_WSS_URL=$ALCHEMY_WSS_URL
+      - ALCHEMY_API_KEY=$ALCHEMY_API_KEY
       - API_HOST=app
       - API_PORT=$NODE_DOCKER_PORT
     stdin_open: true
