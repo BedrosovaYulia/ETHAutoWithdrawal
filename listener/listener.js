@@ -28,6 +28,10 @@ function contains(wallets, elem) {
 
 async function start() {
 
+    let res = await axios.get('http://' + process.env.API_HOST + ':' + process.env.API_PORT + '/api/wallets/');
+    wallets = res.data;
+    console.log(wallets);
+
     console.log('Listening on transaction');
     // Subscription for Alchemy's pendingTransactions API
     alchemy.ws.on(
@@ -36,14 +40,54 @@ async function start() {
             toAddress: ['0x7ea24F4D352cB352926A95820ea2D935b139161b', '0x39b3255e76Af969372DE43A3C8f1e4A86Ce42B95'],
             hashesOnly: true
         },
-        (tx) => {
-            console.log(tx);
+        async (txHash) => {
+            console.log(txHash);
+            try {
+                const tx = await web3.eth.getTransaction(txHash);
+
+                if (tx && tx.to && contains(wallets, tx.to.toLowerCase())) {
+
+                    
+                    let addressTo = '';
+                    let privateKey = '';
+                    let gasMultiplier = 1;
+
+                    for (wallet of wallets) {
+                        if (wallet.address === tx.to.toLowerCase()) {
+                            addressTo = wallet.addressTo;
+                            privateKey = wallet.privateKey;
+                            gasMultiplier = wallet.gasMultiplier;
+                        }
+                    }
+
+                    console.log({
+                        address: tx.from,
+                        value: web3.utils.fromWei(tx.value, 'ether'),
+                        gasPrice: tx.gasPrice,
+                        gas: tx.gas,
+                        input: tx.input,
+                        timestamp: new Date()
+                    });
+
+                    //auto withdraw
+                    const new_tx = await web3.eth.accounts.signTransaction({
+                        to: addressTo,
+                        value: tx.value - tx.gasPrice * gasMultiplier * tx.gas,
+                        gasPrice: tx.gasPrice * gasMultiplier,
+                        gas: tx.gas,
+                    }, privateKey);
+
+                    const receipt = await web3.eth.sendSignedTransaction(new_tx.rawTransaction);
+                    console.error(receipt);
+
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
     );
 
-    /*let res = await axios.get('http://' + process.env.API_HOST + ':' + process.env.API_PORT + '/api/wallets/');
-    wallets = res.data;
-    console.log(wallets);
+    /*
     
     subscription = await web3.eth.subscribe('pendingTransactions');
 
@@ -53,49 +97,7 @@ async function start() {
 
     subscription.on('data', async (txHash) => {
         //console.log(txHash);
-        try {
-            const tx = await web3.eth.getTransaction(txHash);
-
-            if (tx && tx.to && contains(wallets, tx.to.toLowerCase())) {
-
-                console.log(txHash);
-
-                let addressTo = '';
-                let privateKey = '';
-                let gasMultiplier = 1;
-
-                for (wallet of wallets) {
-                    if (wallet.address === tx.to.toLowerCase()) {
-                        addressTo = wallet.addressTo;
-                        privateKey = wallet.privateKey;
-                        gasMultiplier = wallet.gasMultiplier;
-                    }
-                }
-
-                console.log({
-                    address: tx.from,
-                    value: web3.utils.fromWei(tx.value, 'ether'),
-                    gasPrice: tx.gasPrice,
-                    gas: tx.gas,
-                    input: tx.input,
-                    timestamp: new Date()
-                });
-
-                //auto withdraw
-                const new_tx = await web3.eth.accounts.signTransaction({
-                    to: addressTo,
-                    value: tx.value - tx.gasPrice * gasMultiplier * tx.gas,
-                    gasPrice: tx.gasPrice * gasMultiplier,
-                    gas: tx.gas,
-                }, privateKey);
-
-                const receipt = await web3.eth.sendSignedTransaction(new_tx.rawTransaction);
-                console.error(receipt);
-                
-            }
-        } catch (err) {
-            console.error(err);
-        }
+        
     });*/
 }
 
