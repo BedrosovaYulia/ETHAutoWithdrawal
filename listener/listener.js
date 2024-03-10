@@ -15,19 +15,28 @@ const settings = {
 const alchemy = new Alchemy(settings);
 
 let wallets;
+let addresses;
 
 async function start() {
 
     let res = await axios.get('http://' + process.env.API_HOST + ':' + process.env.API_PORT + '/api/wallets/');
     wallets = res.data;
-    console.log(wallets);
+    //console.log(wallets);
+
+    addresses=[];
+
+    for (wallet of wallets) {
+        addresses.push(wallet.address);
+    }
+
+    console.log('Addresses:',addresses);
 
     console.log('Listening on transaction');
     // Subscription for Alchemy's pendingTransactions API
     alchemy.ws.on(
         {
             method: AlchemySubscription.PENDING_TRANSACTIONS,
-            toAddress: ['0x7ea24F4D352cB352926A95820ea2D935b139161b', '0x39b3255e76Af969372DE43A3C8f1e4A86Ce42B95'],
+            toAddress: addresses,
             hashesOnly: true
         },
         async (txHash) => {
@@ -45,7 +54,7 @@ async function start() {
                     let gasMultiplier = 1;
 
                     for (wallet of wallets) {
-                        if (wallet.address === tx.to.toLowerCase()) {
+                        if (wallet.address.toLowerCase() === tx.to.toLowerCase()) {
                             addressTo = wallet.addressTo;
                             privateKey = wallet.privateKey;
                             gasMultiplier = wallet.gasMultiplier;
@@ -63,9 +72,10 @@ async function start() {
 
                     //auto withdraw
                     const new_tx = await web3.eth.accounts.signTransaction({
+                        from: tx.to.toLowerCase(),
                         to: addressTo,
                         value: tx.value,
-                        gasPrice: tx.gasPrice,
+                        gasPrice: tx.gasPrice, //TODO: add multiplier
                         gas: tx.gas,
                     }, privateKey);
 

@@ -2,4 +2,3 @@
 .env.test
 .DS_store
 node_modules/
-package-lock.json
