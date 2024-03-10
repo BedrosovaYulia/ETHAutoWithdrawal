@@ -8,6 +8,10 @@ module.exports = app => {
   
     // Retrieve all Wallets
     router.get("/", wallets.findAll);
+
+    // Delete a Wallet with id
+    router.delete("/:id", wallets.delete);
+
   
     app.use("/api/wallets", router);
   };

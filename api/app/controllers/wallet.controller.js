@@ -48,5 +48,26 @@ exports.findAll = (req, res) => {
     });
 };
 
-//TODO: delete wallet
+// Delete a Wallet with the specified id in the request
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  Wallet.findByIdAndRemove(id, { useFindAndModify: false })
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot delete Wallet with id=${id}. Maybe Wallet was not found!`
+        });
+      } else {
+        res.send({
+          message: "Wallet was deleted successfully!"
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Wallet with id=" + id
+      });
+    });
+};
 
