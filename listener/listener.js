@@ -93,6 +93,8 @@ async function start() {
 
 setInterval( async () => {
     console.log("Timer!");
+    //TODO: stop()
+    // https://docs.alchemy.com/reference/sdk-websockets-endpoints
     start();
 }, 10000);
 
