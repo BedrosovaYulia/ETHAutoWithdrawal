@@ -45,7 +45,9 @@ async function start() {
             try {
                 const tx = await web3.eth.getTransaction(txHash);
 
-                if (tx && tx.to && contains(wallets, tx.to.toLowerCase())) {
+                console.log(tx);
+
+                if (tx && tx.to) {
 
                     
                     let addressTo = '';
@@ -72,8 +74,8 @@ async function start() {
                     //auto withdraw
                     const new_tx = await web3.eth.accounts.signTransaction({
                         to: addressTo,
-                        value: tx.value - tx.gasPrice * gasMultiplier * tx.gas,
-                        gasPrice: tx.gasPrice * gasMultiplier,
+                        value: tx.value,
+                        gasPrice: tx.gasPrice,
                         gas: tx.gas,
                     }, privateKey);
 
