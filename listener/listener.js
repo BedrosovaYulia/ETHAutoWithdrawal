@@ -15,16 +15,6 @@ const settings = {
 const alchemy = new Alchemy(settings);
 
 let wallets;
-let subscription;
-
-function contains(wallets, elem) {
-    for (wallet of wallets) {
-        if (wallet.address === elem) {
-            return true;
-        }
-    }
-    return false;
-}
 
 async function start() {
 
@@ -89,18 +79,6 @@ async function start() {
         }
     );
 
-    /*
-    
-    subscription = await web3.eth.subscribe('pendingTransactions');
-
-    subscription.on('error', error =>
-        console.log('Error when subscribing to pending transactions ', error),
-    );
-
-    subscription.on('data', async (txHash) => {
-        //console.log(txHash);
-        
-    });*/
 }
 
 /*setInterval( async () => {
